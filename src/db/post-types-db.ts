@@ -1,8 +1,11 @@
+import {ObjectId} from "mongodb";
+
 export type PostDBType = {
-    id: string,
+    _id: ObjectId
     title: string,
     shortDescription: string,
     content: string,
     blogId: string,
-    blogName: string
+    blogName: string,
+    createdAt: string,
 }
