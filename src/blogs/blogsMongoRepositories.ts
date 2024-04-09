@@ -1,5 +1,3 @@
-import {db} from "../db/db";
-import {v4 as uuid} from 'uuid'
 import {BlogDBType} from "../db/blog-types-db";
 import {BodyTypeBlog} from "../types/request-response-type";
 import {blogCollection} from "../db/mongo-db";
@@ -12,7 +10,6 @@ export const blogsMongoRepositories = {
             createdAt: new Date().toISOString(),
             isMembership: false
         }
-
         try {
             const insertedBlog = await blogCollection.insertOne(newBlog);
             console.log(insertedBlog)
@@ -21,29 +18,38 @@ export const blogsMongoRepositories = {
             console.log(e)
             return {error: e};
         }
-
-
-        // db.blogs = [...db.blogs, newBlog];
-        // return newBlog.id;
     },
-    // findBlogById: async (id: string) => {
-    //     return db.blogs.find(b => b.id === id) || false;
-    // },
+    findBlogById: async (id: string) => {
+        try {
+            return await blogCollection.findOne({_id: new ObjectId(id)})
+        } catch (e) {
+            console.log(e)
+            return {error: e};
+        }
+
+    },
     findAllBlogs: async () => {
-        return blogCollection.find({});
+        try {
+            return await blogCollection.find().toArray();
+        } catch (e) {
+            return {error: e};
+        }
     },
-    // updateBlog: async (id: string, inputUpdateDataBlog: BodyTypeBlog) => {
-    //     const {name, websiteUrl, description} = inputUpdateDataBlog
-    //
-    //     const findBlog = db.blogs.find(b => b.id === id);
-    //     if (findBlog) {
-    //         findBlog.name = name;
-    //         findBlog.websiteUrl = websiteUrl;
-    //         findBlog.description = description;
-    //         return true;
-    //     }
-    //     return false;
-    // },
+    updateBlog: async (id: string, inputUpdateDataBlog: BodyTypeBlog) => {
+        const {name, websiteUrl, description} = inputUpdateDataBlog
+        const findBlog = await blogCollection.findOne({_id: new ObjectId(id)});
+        if (findBlog) {
+            const success = await blogCollection.findOneAndUpdate({_id: new ObjectId(id)}, {
+                $set: {
+                    name,
+                    description,
+                    websiteUrl
+                }
+            });
+            return true;
+        }
+        return false;
+    },
     // deleteBlog: async (id: string) => {
     //     const flag = db.blogs.find(b => b.id === id)
     //     if (!flag) {
