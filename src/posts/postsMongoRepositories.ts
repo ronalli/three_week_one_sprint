@@ -1,17 +1,19 @@
-// import {v4 as uuid} from 'uuid'
-//
-// import {db} from "../db/db";
 import {BodyTypePost} from "../types/request-response-type";
 import {PostDBType} from "../db/post-types-db";
-// import {blogsRepositories} from "../blogs/blogsRepositories";
-//
+
 import {postCollection} from "../db/mongo-db";
 import {blogsMongoRepositories} from "../blogs/blogsMongoRepositories";
+import {ObjectId} from "mongodb";
 
 export const postsMongoRepositories = {
-    // findPostById: async (id: string) => {
-    //     return db.posts.find(b => b.id === id);
-    // },
+    findPostById: async (id: string) => {
+        try {
+            return await postCollection.findOne({_id: new ObjectId(id)});
+        } catch (e) {
+            console.log(e)
+            return;
+        }
+    },
     findAllPosts: async () => {
         try {
             return postCollection.find({}).toArray()
@@ -40,23 +42,32 @@ export const postsMongoRepositories = {
         }
         return false;
     },
-    // updatePost: async (id: string, updatePost: BodyTypePost) => {
-    //     const findPost = db.posts.find(p => p.id === id);
-    //     if(findPost) {
-    //         findPost.title = updatePost.title
-    //         findPost.content = updatePost.content
-    //         findPost.shortDescription = updatePost.shortDescription
-    //         findPost.blogId = updatePost.blogId
-    //         return true;
-    //     }
-    //     return false;
-    // },
-    // deletePost: async (id: string) => {
-    //     const findDeletePost = db.posts.find(p => p.id === id);
-    //     if(findDeletePost) {
-    //         db.posts = db.posts.filter(p => p.id !== id);
-    //         return true;
-    //     }
-    //     return false;
-    // },
+    updatePost: async (id: string, updatePost: BodyTypePost) => {
+        try {
+            const findPost = await postCollection.findOne({_id: new ObjectId(id)});
+
+            if(findPost) {
+                await postCollection.findOneAndUpdate({_id: new ObjectId(id)}, {$set: {
+                        title: updatePost.title,
+                        content: updatePost.content,
+                        shortDescription: updatePost.shortDescription,
+                        blogId: updatePost.blogId
+                    }})
+                return true;
+            }
+            return false;
+        } catch (e) {
+            console.log(e)
+            return;
+        }
+
+    },
+    deletePost: async (id: string) => {
+        const findDeletePost = await postCollection.findOne({_id: new ObjectId(id)});
+        if(findDeletePost) {
+            await postCollection.findOneAndDelete({_id: new ObjectId(id)});
+            return true;
+        }
+        return false;
+    },
 }

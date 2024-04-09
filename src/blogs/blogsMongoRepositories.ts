@@ -22,7 +22,7 @@ export const blogsMongoRepositories = {
         try {
             return await blogCollection.findOne({_id: new ObjectId(id)})
         } catch (e) {
-            console.log(e)
+            console.log("22", e)
             return;
         }
 

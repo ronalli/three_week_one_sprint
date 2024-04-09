@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {ValidationError, validationResult} from "express-validator";
+import {validationResult} from "express-validator";
 import {HTTP_STATUSES} from "../settings";
 import {formatingDataErrors} from "../utils/fromatingData";
 
@@ -7,7 +7,6 @@ export const inputCheckErrorsMiddleware = (req: Request, res: Response, next: Ne
     const errors = validationResult(req).array({onlyFirstError: true})
     if (errors.length > 0) {
         res.status(HTTP_STATUSES.BED_REQUEST_400).send(formatingDataErrors(errors))
-        // res.status(HTTP_STATUSES.NOT_FOUND_404).send(formatingDataErrors(errors))
         return;
     }
     next();
