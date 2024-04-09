@@ -1,7 +1,6 @@
 import {Response, Request, NextFunction} from 'express'
 import {HTTP_STATUSES} from "../settings";
 
-
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const auth = req.headers.authorization;
     if(auth) {
