@@ -43,14 +43,14 @@ export const blogsControllers = {
         res.status(HTTP_STATUSES.NOT_FOUND_404).send({})
         return;
     },
-    // deleteBlog: async (req: Request, res: Response) => {
-    //     const {id} = req.params;
-    //     const flag = await blogsRepositories.deleteBlog(id);
-    //     if(flag) {
-    //         res.status(HTTP_STATUSES.NO_CONTENT_204).send({})
-    //         return
-    //     }
-    //     res.status(HTTP_STATUSES.NOT_FOUND_404).send({})
-    //     return
-    // },
+    deleteBlog: async (req: Request, res: Response) => {
+        const {id} = req.params;
+        const flag = await blogsMongoRepositories.deleteBlog(id);
+        if(flag) {
+            res.status(HTTP_STATUSES.NO_CONTENT_204).send({})
+            return
+        }
+        res.status(HTTP_STATUSES.NOT_FOUND_404).send({})
+        return
+    },
 }

@@ -2,6 +2,8 @@ import {BlogDBType} from "../db/blog-types-db";
 import {BodyTypeBlog} from "../types/request-response-type";
 import {blogCollection} from "../db/mongo-db";
 import {ObjectId} from "mongodb";
+import {blogsControllers} from "./blogsControllers";
+import e from "express";
 
 export const blogsMongoRepositories = {
     createBlog: async (blog: BodyTypeBlog) => {
@@ -37,26 +39,37 @@ export const blogsMongoRepositories = {
     },
     updateBlog: async (id: string, inputUpdateDataBlog: BodyTypeBlog) => {
         const {name, websiteUrl, description} = inputUpdateDataBlog
-        const findBlog = await blogCollection.findOne({_id: new ObjectId(id)});
-        if (findBlog) {
-            const success = await blogCollection.findOneAndUpdate({_id: new ObjectId(id)}, {
-                $set: {
-                    name,
-                    description,
-                    websiteUrl
-                }
-            });
-            return true;
+
+        try {
+            const findBlog = await blogCollection.findOne({_id: new ObjectId(id)});
+            if (findBlog) {
+                const success = await blogCollection.findOneAndUpdate({_id: new ObjectId(id)}, {
+                    $set: {
+                        name,
+                        description,
+                        websiteUrl
+                    }
+                });
+                return true;
+            } else {
+                return false;
+            }
+        } catch (e) {
+            console.log(e)
+            return {error: e};
         }
-        return false;
     },
-    // deleteBlog: async (id: string) => {
-    //     const flag = db.blogs.find(b => b.id === id)
-    //     if (!flag) {
-    //         return false;
-    //     } else {
-    //         db.blogs = db.blogs.filter(b => b.id !== id);
-    //         return true;
-    //     }
-    // }
+    deleteBlog: async (id: string) => {
+        try {
+            const flag = await blogCollection.findOne({_id: new ObjectId(id)});
+            if (!flag) {
+                return false;
+            } else {
+                await blogCollection.findOneAndDelete({_id: new ObjectId(id)});
+                return true;
+            }
+        } catch (e) {
+            return {error: e};
+        }
+    }
 }
