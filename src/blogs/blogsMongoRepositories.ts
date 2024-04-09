@@ -1,9 +1,6 @@
-import {BlogDBType} from "../db/blog-types-db";
 import {BodyTypeBlog} from "../types/request-response-type";
 import {blogCollection} from "../db/mongo-db";
 import {ObjectId} from "mongodb";
-import {blogsControllers} from "./blogsControllers";
-import e from "express";
 
 export const blogsMongoRepositories = {
     createBlog: async (blog: BodyTypeBlog) => {
@@ -18,7 +15,7 @@ export const blogsMongoRepositories = {
             return {id: new ObjectId(insertedBlog.insertedId)}
         } catch (e) {
             console.log(e)
-            return {error: e};
+            return;
         }
     },
     findBlogById: async (id: string) => {
@@ -26,7 +23,7 @@ export const blogsMongoRepositories = {
             return await blogCollection.findOne({_id: new ObjectId(id)})
         } catch (e) {
             console.log(e)
-            return {error: e};
+            return;
         }
 
     },
@@ -34,7 +31,8 @@ export const blogsMongoRepositories = {
         try {
             return await blogCollection.find().toArray();
         } catch (e) {
-            return {error: e};
+            console.log(e)
+            return;
         }
     },
     updateBlog: async (id: string, inputUpdateDataBlog: BodyTypeBlog) => {
@@ -43,7 +41,7 @@ export const blogsMongoRepositories = {
         try {
             const findBlog = await blogCollection.findOne({_id: new ObjectId(id)});
             if (findBlog) {
-                const success = await blogCollection.findOneAndUpdate({_id: new ObjectId(id)}, {
+                await blogCollection.findOneAndUpdate({_id: new ObjectId(id)}, {
                     $set: {
                         name,
                         description,
@@ -56,7 +54,7 @@ export const blogsMongoRepositories = {
             }
         } catch (e) {
             console.log(e)
-            return {error: e};
+            return false;
         }
     },
     deleteBlog: async (id: string) => {
@@ -69,7 +67,8 @@ export const blogsMongoRepositories = {
                 return true;
             }
         } catch (e) {
-            return {error: e};
+            console.log(e)
+            return;
         }
     }
 }
