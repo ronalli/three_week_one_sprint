@@ -1,6 +1,7 @@
 import {BodyTypeBlog} from "../types/request-response-type";
 import {blogCollection} from "../db/mongo-db";
 import {ObjectId} from "mongodb";
+import {formatingDataForOutput} from "../utils/fromatingData";
 
 export const blogsMongoRepositories = {
     createBlog: async (blog: BodyTypeBlog) => {
@@ -11,8 +12,11 @@ export const blogsMongoRepositories = {
         }
         try {
             const insertedBlog = await blogCollection.insertOne(newBlog);
-            console.log(insertedBlog)
-            return {id: new ObjectId(insertedBlog.insertedId)}
+            const foundBlog = await blogCollection.findOne({_id: insertedBlog.insertedId})
+            if(foundBlog) {
+                return formatingDataForOutput(foundBlog)
+            }
+            return;
         } catch (e) {
             console.log(e)
             return;
@@ -20,16 +24,24 @@ export const blogsMongoRepositories = {
     },
     findBlogById: async (id: string) => {
         try {
-            return await blogCollection.findOne({_id: new ObjectId(id)})
+            const foundBlog = await blogCollection.findOne({_id: new ObjectId(id)});
+            if(foundBlog) {
+                return formatingDataForOutput(foundBlog);
+            }
+            return;
         } catch (e) {
-            console.log("22", e)
+            // console.log(e)
             return;
         }
 
     },
     findAllBlogs: async () => {
         try {
-            return await blogCollection.find().toArray();
+            const foundedBlogs = await blogCollection.find({}).toArray()
+            if(foundedBlogs.length > 0) {
+                return foundedBlogs.map(blog => {return formatingDataForOutput(blog)})
+            }
+            return;
         } catch (e) {
             console.log(e)
             return;
@@ -37,7 +49,6 @@ export const blogsMongoRepositories = {
     },
     updateBlog: async (id: string, inputUpdateDataBlog: BodyTypeBlog) => {
         const {name, websiteUrl, description} = inputUpdateDataBlog
-
         try {
             const findBlog = await blogCollection.findOne({_id: new ObjectId(id)});
             if (findBlog) {

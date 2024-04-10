@@ -14,4 +14,4 @@ app.get('/', (req, res) => {
 
 app.use(SETTINGS.PATH.BLOGS, blogsRouter)
 app.use(SETTINGS.PATH.POSTS, postsRouter)
-// app.use(SETTINGS.PATH.ALL_DELETE, testingRouter)
+app.use(SETTINGS.PATH.ALL_DELETE, testingRouter)

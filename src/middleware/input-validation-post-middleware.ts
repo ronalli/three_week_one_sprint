@@ -23,7 +23,6 @@ const validationBlogId = body('blogId').trim().notEmpty().withMessage('Field blo
                 throw new Error('Field blogId is incorrect')
             }
             return true;
-
         })
 
 export const validationCreatePost = [validationBlogId, validationTitle, validationShortDescription, validationContent];
