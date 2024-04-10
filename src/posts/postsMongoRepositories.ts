@@ -1,29 +1,37 @@
 import {BodyTypePost} from "../types/request-response-type";
 import {PostDBType} from "../db/post-types-db";
 
-import {postCollection} from "../db/mongo-db";
+import { postCollection} from "../db/mongo-db";
 import {blogsMongoRepositories} from "../blogs/blogsMongoRepositories";
 import {ObjectId} from "mongodb";
+import { formatingDataForOutputPost} from "../utils/fromatingData";
 
 export const postsMongoRepositories = {
     findPostById: async (id: string) => {
         try {
-            return await postCollection.findOne({_id: new ObjectId(id)});
+            const foundPost = await postCollection.findOne({_id: new ObjectId(id)});
+            if(foundPost) {
+                return formatingDataForOutputPost(foundPost);
+            }
+            return;
         } catch (e) {
-            console.log(e)
             return;
         }
     },
     findAllPosts: async () => {
         try {
-            return postCollection.find({}).toArray()
+            const foundPosts = await postCollection.find({}).toArray();
+            if(foundPosts.length > 0) {
+                return foundPosts.map(post => {return formatingDataForOutputPost(post)});
+            }
+            return;
         } catch (e) {
-            console.log(e)
-            return {error: e};
+            return;
         }
 
     },
     createPost: async (post: BodyTypePost) => {
+        console.log('fff111')
         const findBlog = await blogsMongoRepositories.findBlogById(post.blogId);
         let newPost: PostDBType;
         if(findBlog) {
@@ -32,11 +40,17 @@ export const postsMongoRepositories = {
                 blogName: findBlog.name,
                 createdAt: new Date().toISOString(),
             }
+            console.log('uuu')
             try {
-                await postCollection.insertOne(newPost);
-                return newPost;
+               const insertedPost= await postCollection.insertOne(newPost);
+               const foundPost = await postCollection.findOne({_id: insertedPost.insertedId});
+                console.log('ttt')
+                if(foundPost) {
+                    console.log('eee')
+                    return formatingDataForOutputPost(foundPost);
+                }
+                return;
             } catch (e) {
-                console.log(e)
                 return;
             }
         }
@@ -57,7 +71,6 @@ export const postsMongoRepositories = {
             }
             return false;
         } catch (e) {
-            console.log(e)
             return;
         }
 

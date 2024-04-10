@@ -1,7 +1,7 @@
 import {BodyTypeBlog} from "../types/request-response-type";
 import {blogCollection} from "../db/mongo-db";
 import {ObjectId} from "mongodb";
-import {formatingDataForOutput} from "../utils/fromatingData";
+import { formatingDataForOutputBlog} from "../utils/fromatingData";
 
 export const blogsMongoRepositories = {
     createBlog: async (blog: BodyTypeBlog) => {
@@ -14,7 +14,7 @@ export const blogsMongoRepositories = {
             const insertedBlog = await blogCollection.insertOne(newBlog);
             const foundBlog = await blogCollection.findOne({_id: insertedBlog.insertedId})
             if(foundBlog) {
-                return formatingDataForOutput(foundBlog)
+                return formatingDataForOutputBlog(foundBlog)
             }
             return;
         } catch (e) {
@@ -26,7 +26,7 @@ export const blogsMongoRepositories = {
         try {
             const foundBlog = await blogCollection.findOne({_id: new ObjectId(id)});
             if(foundBlog) {
-                return formatingDataForOutput(foundBlog);
+                return formatingDataForOutputBlog(foundBlog);
             }
             return;
         } catch (e) {
@@ -39,7 +39,7 @@ export const blogsMongoRepositories = {
         try {
             const foundedBlogs = await blogCollection.find({}).toArray()
             if(foundedBlogs.length > 0) {
-                return foundedBlogs.map(blog => {return formatingDataForOutput(blog)})
+                return foundedBlogs.map(blog => {return formatingDataForOutputBlog(blog)})
             }
             return;
         } catch (e) {

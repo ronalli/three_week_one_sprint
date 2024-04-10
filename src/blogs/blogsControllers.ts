@@ -5,14 +5,13 @@ import {HTTP_STATUSES} from "../settings";
 import {BlogDBType} from "../db/blog-types-db";
 import {BodyTypeBlog, ParamType} from "../types/request-response-type";
 import {blogsMongoRepositories} from "./blogsMongoRepositories";
-import {formatingDataForOutput} from "../utils/fromatingData";
 
 export const blogsControllers = {
     createBlog: async (req: Request, res: Response) => {
         const inputDataBlog = req.body as BodyTypeBlog
         const createdBlog = await blogsMongoRepositories.createBlog(inputDataBlog);
         if (createdBlog) {
-            res.status(HTTP_STATUSES.CREATED_201).send(formatingDataForOutput(createdBlog))
+            res.status(HTTP_STATUSES.CREATED_201).send(createdBlog)
             return;
         }
         res.status(HTTP_STATUSES.BED_REQUEST_400).send({})

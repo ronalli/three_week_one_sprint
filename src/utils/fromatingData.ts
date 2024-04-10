@@ -2,6 +2,8 @@ import {OutputErrorsType} from "../types/output-errors-type";
 import {ValidationError} from "express-validator";
 import {BlogDBType} from "../db/blog-types-db";
 import {BlogOutputType} from "../types/output-blog-type";
+import {PostDBType} from "../db/post-types-db";
+import {PostOutputType} from "../types/output-post-type";
 
 
 export const formatingDataErrors = (array: ValidationError[]) => {
@@ -20,7 +22,7 @@ export const formatingDataErrors = (array: ValidationError[]) => {
     return errors;
 }
 
-export const formatingDataForOutput = (input: BlogDBType):BlogOutputType => {
+export const formatingDataForOutputBlog = (input: BlogDBType):BlogOutputType => {
     return {
         id: String(input._id),
         name: input.name,
@@ -28,5 +30,17 @@ export const formatingDataForOutput = (input: BlogDBType):BlogOutputType => {
         websiteUrl: input.websiteUrl,
         createdAt: input.createdAt,
         isMembership: input.isMembership,
+    };
+}
+
+export const formatingDataForOutputPost = (input: PostDBType):PostOutputType => {
+    return {
+        id: String(input._id),
+        blogId: input.blogId,
+        content: input.content,
+        createdAt: input.createdAt,
+        shortDescription: input.shortDescription,
+        blogName: input.blogName,
+        title: input.title,
     };
 }
