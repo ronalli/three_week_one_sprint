@@ -7,7 +7,6 @@ export const db: DBType = {
     blogs: []
 }
 
-
 export const setBlogDB = (dataset: BlogDBType[]) => {
     if(!dataset) {
         db.blogs = [];
