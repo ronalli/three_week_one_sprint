@@ -3,7 +3,6 @@ import {HTTP_STATUSES} from "../src/settings";
 import {SETTINGS} from "../src/settings";
 import {describe} from "node:test";
 import {connectToDB} from "../src/db/mongo-db";
-import {BlogOutputType} from "../src/types/output-blog-type";
 
 
 describe('/blogs', () => {
@@ -17,7 +16,9 @@ describe('/blogs', () => {
             websiteUrl: 'https://it-incubator.com',
             description: 'valid description',
         }
-        const resCreated = await req.post(SETTINGS.PATH.BLOGS).set('Authorization', process.env.AUTH_HEADER || '').send(blog).expect(HTTP_STATUSES.CREATED_201)
+        const resCreated = await req.post(SETTINGS.PATH.BLOGS)
+            .set('Authorization', process.env.AUTH_HEADER || '')
+            .send(blog).expect(HTTP_STATUSES.CREATED_201)
 
         const res = await req.get(`${SETTINGS.PATH.BLOGS}/${String(resCreated.body.id)}`).expect(HTTP_STATUSES.OK_200)
         // // console.log(res.body.id)
@@ -65,4 +66,27 @@ describe('/blogs', () => {
 
         expect(resCreated.body).toEqual(res.body)
     });
+
+    it('should get correct blog', async () => {
+        const foundBlogs = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUSES.OK_200);
+
+        const res = await req.get(`${SETTINGS.PATH.BLOGS}/${String(foundBlogs.body[0].id)}`).expect(HTTP_STATUSES.OK_200);
+
+        expect(foundBlogs.body[0].id).toEqual(res.body.id)
+    });
+
+    it('shouldn\'t get blog with incorrect id', async () => {
+        const res = await req.get(`${SETTINGS.PATH.BLOGS}/${String(35534534534534)}`).expect(HTTP_STATUSES.NOT_FOUND_404);
+    });
+
+    it('should correct delete blog', async () => {
+        const foundBlogs = await req.get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUSES.OK_200);
+
+        await req.delete(`${SETTINGS.PATH.BLOGS}/${String(foundBlogs.body[0].id)}`)
+            .set('Authorization', process.env.AUTH_HEADER || '')
+            .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+        const res = await req.get(`${SETTINGS.PATH.BLOGS}/${String(foundBlogs.body[0].id)}`).expect(HTTP_STATUSES.NOT_FOUND_404)
+    });
+
 })

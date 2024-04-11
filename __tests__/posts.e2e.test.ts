@@ -1,36 +1,38 @@
-// import {req} from "./test-helpers";
-// import {HTTP_STATUSES} from "../src/settings";
-// import {SETTINGS} from "../src/settings";
-//
-// import {describe} from "node:test";
-// import {dataset} from "./dataset";
-// import {db, setBlogDB, setPostDB} from "../src/db/db";
-// import {InputPostType} from "../src/types/input-post-type";
-//
-// describe('/posts', () => {
-//     beforeAll(async () => {
-//         await req.delete(SETTINGS.PATH.ALL_DELETE + '/all-data')
-//     })
-//
-//     it('shouldn\'t return posts, as not found blogId', async () => {
-//         const newPost: InputPostType = {
-//             blogId: 'fsd',
-//             content: 'content 2',
-//             shortDescription: 'shortdescription',
-//             title: 'test 2'
-//         }
-//         const res = await req.post(SETTINGS.PATH.POSTS).set('Authorization', process.env.AUTH_HEADER || '').send(newPost).expect(HTTP_STATUSES.BED_REQUEST_400);
-//     });
-//
-//     it('shouldn\'t create posts, as don\'t authorization', async () => {
-//         const newPost: InputPostType = {
-//             blogId: 'fsd',
-//             content: 'content 2',
-//             shortDescription: 'shortdescription',
-//             title: 'test 2'
-//         }
-//         const res = await req.post(SETTINGS.PATH.POSTS).send(newPost).expect(HTTP_STATUSES.UNAUTHORIZED)
-//     });
+import {req} from "./test-helpers";
+import {HTTP_STATUSES} from "../src/settings";
+import {SETTINGS} from "../src/settings";
+import {describe} from "node:test";
+import {connectToDB, postCollection} from "../src/db/mongo-db";
+
+describe('/posts', () => {
+    beforeAll(async () => {
+        await req.delete(SETTINGS.PATH.ALL_DELETE + '/all-data')
+        await connectToDB();
+    })
+    it('shouldn\'t create post, as not found blogId', async () => {
+        const newPost = {
+            blogId: 'fsd',
+            content: 'content 2',
+            shortDescription: 'short description',
+            title: 'test 2'
+        }
+        const res = await req.post(SETTINGS.PATH.POSTS)
+            .set('Authorization', process.env.AUTH_HEADER || '')
+            .send(newPost).expect(HTTP_STATUSES.BED_REQUEST_400);
+    });
+
+    it('shouldn\'t create post, as not found authorization header', async () => {
+        const newPost = {
+            blogId: 'fsd',
+            content: 'content 2',
+            shortDescription: 'short description',
+            title: 'test 2'
+        }
+        const res = await req.post(SETTINGS.PATH.POSTS)
+            .send(newPost).expect(HTTP_STATUSES.UNAUTHORIZED);
+    });
+
+});
 //     it('shouldn\'t create posts, as don\'t authorization', async () => {
 //         const newPost: InputPostType = {
 //             blogId: 'fsd',
