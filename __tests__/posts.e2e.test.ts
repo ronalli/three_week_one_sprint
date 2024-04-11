@@ -51,14 +51,11 @@ describe('/posts', () => {
             .set('Authorization', process.env.AUTH_HEADER || '')
             .send(newPost).expect(HTTP_STATUSES.CREATED_201);
 
-        console.log(res)
-
         const findPost = await  req.get(`${SETTINGS.PATH.POSTS}/${res.body.id}`).expect(HTTP_STATUSES.OK_200)
     });
     it('should correct update post', async () => {
 
         const findPosts = await req.get(SETTINGS.PATH.POSTS);
-        // console.log(findPosts.body[0].id)
 
         const updatePost: BodyTypePost = {
             title: 'test 2',

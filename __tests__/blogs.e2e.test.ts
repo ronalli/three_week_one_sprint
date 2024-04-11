@@ -3,6 +3,7 @@ import {HTTP_STATUSES} from "../src/settings";
 import {SETTINGS} from "../src/settings";
 import {describe} from "node:test";
 import {connectToDB} from "../src/db/mongo-db";
+import {BodyTypeBlog} from "../src/types/request-response-type";
 
 
 describe('/blogs', () => {
@@ -96,5 +97,31 @@ describe('/blogs', () => {
 
         const res = await req.get(`${SETTINGS.PATH.BLOGS}/${String(foundBlogs.body[0].id)}`).expect(HTTP_STATUSES.NOT_FOUND_404)
     });
+
+    it('should correct update blog', async () => {
+        const findBlogs = await req.get(SETTINGS.PATH.BLOGS);
+
+        const updateBlogs: BodyTypeBlog = {
+            name: 'test valid',
+            websiteUrl: 'https://example.com',
+            description: 'valid description',
+        }
+
+        await req.put(`${SETTINGS.PATH.BLOGS}/${String(findBlogs.body[0].id)}`)
+            .set('Authorization', process.env.AUTH_HEADER || '')
+            .send(updateBlogs)
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+    })
+
+    it('should correct delete vlog', async () => {
+        const findBlogs = await req.get(SETTINGS.PATH.BLOGS);
+
+        await req.delete(`${SETTINGS.PATH.BLOGS}/${String(findBlogs.body[0].id)}`)
+            .set('Authorization', process.env.AUTH_HEADER || '')
+            .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+        await req.get(`${SETTINGS.PATH.BLOGS}/${String(findBlogs.body[0].id)}`).expect(HTTP_STATUSES.NOT_FOUND_404)
+    })
 
 })
