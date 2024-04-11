@@ -21,7 +21,6 @@ describe('/blogs', () => {
             .send(blog).expect(HTTP_STATUSES.CREATED_201)
 
         const res = await req.get(`${SETTINGS.PATH.BLOGS}/${String(resCreated.body.id)}`).expect(HTTP_STATUSES.OK_200)
-        // // console.log(res.body.id)
         expect(String(resCreated.body.id)).toEqual(res.body.id);
     });
 
@@ -47,10 +46,19 @@ describe('/blogs', () => {
         const blog = {
             name: 't',
             websiteUrl: 'https://it-incubator..com',
-            // description: 'valid description',
         }
         const resCreated = await req.post(SETTINGS.PATH.BLOGS).set('Authorization', process.env.AUTH_HEADER || '')
             .send(blog).expect(HTTP_STATUSES.BED_REQUEST_400)
+    });
+
+    it('shouldn\'t created blog, because not found correct authorization header', async () => {
+        const blog = {
+            name: 'test valid',
+            websiteUrl: 'https://it-incubator.com',
+            description: 'valid description',
+        }
+        const resCreated = await req.post(SETTINGS.PATH.BLOGS).set('Authorization', process.env.AUTH_HEADER_FAIL || '')
+            .send(blog).expect(HTTP_STATUSES.UNAUTHORIZED)
     });
 
     it('should created blog, and return correct data', async () => {
